@@ -1,0 +1,124 @@
+fmod SENSOR  is
+    protecting FLOAT .
+    including STRING .
+
+    sort GenericSensor .
+    sorts HeartSensor BloodSensor BreathSensor TemperatureSensor BrainSensor .
+
+    subsort GenericSensor < HeartSensor BloodSensor BreathSensor TemperatureSensor BrainSensor .
+
+    sort SensorStatus .
+    subsort String < SensorStatus .
+
+    sorts MinValue MaxValue CurrentBeat CurrentPressure CurrentBreath CurrentTemp CurrentBrain .
+    subsort Float <  MinValue MaxValue CurrentBeat CurrentPressure CurrentBreath CurrentTemp CurrentBrain .
+
+    var currentHeartbeat : CurrentBeat .
+    var currentBloodPressure : CurrentPressure .
+    var currentBreathFrequency : CurrentBreath .
+    var currentTemperature : CurrentTemp .
+    var currentBrainActivity : CurrentBrain .
+    
+    vars minHB minBF minBP minTemp minBA : MinValue .
+    vars maxHB maxBF maxBP maxTemp maxBA : MaxValue .
+    var newValue : Float .
+
+    --- initializers
+    op heartSensor : MinValue MaxValue CurrentBeat -> HeartSensor .
+    op bloodSensor : MinValue MaxValue CurrentPressure -> BloodSensor .
+    op breathSensor : MinValue MaxValue CurrentBreath -> BreathSensor .
+    op temperatureSensor : MinValue MaxValue CurrentTemp -> TemperatureSensor .
+    op brainSensor : MinValue MaxValue CurrentBrain -> BrainSensor .
+
+    --- constants
+    ops LOW HIGH OK : -> SensorStatus .
+    eq LOW = "LOW" .	
+    eq OK = "OK" .
+    eq HIGH = "HIGH" .
+
+    --- get and set values 
+    op getSensorValue : GenericSensor -> Float .
+
+    eq getSensorValue(heartSensor(minHB, maxHB, currentHeartbeat)) = currentHeartbeat .
+    eq getSensorValue(bloodSensor(minBP, maxBP, currentBloodPressure)) = currentBloodPressure .
+    eq getSensorValue(breathSensor(minBF, maxBF, currentBreathFrequency)) = currentBreathFrequency .
+    eq getSensorValue(temperatureSensor(minTemp, maxTemp, currentTemperature)) = currentTemperature .
+    eq getSensorValue(brainSensor(minBA, maxBA, currentBrainActivity)) = currentBrainActivity .
+
+    op setSensorValue : GenericSensor Float -> GenericSensor .
+
+    eq setSensorValue(heartSensor(minHB, maxHB, currentHeartbeat), newValue) = heartSensor(minHB, maxHB, newValue) .
+    eq setSensorValue(bloodSensor(minBP, maxBP, currentBloodPressure), newValue) = bloodSensor(minBP, maxBP, newValue) .
+    eq setSensorValue(breathSensor(minBF, maxBF, currentBreathFrequency), newValue) = breathSensor(minBF, maxBF, newValue) .
+    eq setSensorValue(temperatureSensor(minTemp, maxTemp, currentTemperature), newValue) = temperatureSensor(minTemp, maxTemp, newValue) .
+    eq setSensorValue(brainSensor(minBA, maxBA, currentBrainActivity), newValue) = brainSensor(minBA, maxBA, newValue) .
+
+
+    eq getSensorValue(setSensorValue(heartSensor(minHB, maxHB, currentHeartbeat), newValue)) = newValue .
+    eq getSensorValue(setSensorValue(bloodSensor(minBP, maxBP, currentBloodPressure), newValue)) = newValue .
+    eq getSensorValue(setSensorValue(breathSensor(minBF, maxBF, currentBreathFrequency), newValue)) = newValue .
+    eq getSensorValue(setSensorValue(temperatureSensor(minTemp, maxTemp, currentTemperature), newValue)) = newValue .
+    eq getSensorValue(setSensorValue(brainSensor(minBA, maxBA, currentBrainActivity), newValue)) = newValue .
+
+    --- ------------------------------
+    --- unnecessarily complex solution is commented out
+    --- ------------------------------
+    --- sensor check functions
+    --- op heartCheck : HeartSensor -> SensorStatus .
+    --- op bloodCheck : BloodSensor -> SensorStatus .
+    --- op breathCheck : BreathSensor -> SensorStatus .
+    --- op temperatureCheck : TemperatureSensor -> SensorStatus .
+    --- op brainCheck : BrainSensor -> SensorStatus .
+
+
+    --- eq heartCheck(heartSensor(minHB, maxHB, currentHeartbeat)) = if currentHeartbeat < minHB then LOW
+    ---                                     else if currentHeartbeat > maxHB then HIGH
+    ---                                         else OK fi 
+    ---                                     fi .
+
+    --- eq bloodCheck(bloodSensor(minBP, maxBP, currentBloodPressure)) = if currentBloodPressure < minBP then LOW
+    ---                                     else if currentBloodPressure > maxBP then HIGH
+    ---                                         else OK fi 
+    ---                                     fi .
+
+    --- eq breathCheck(breathSensor(minBF, maxBF, currentBreathFrequency)) = if currentBreathFrequency < minBF then LOW
+    ---                                     else if currentBreathFrequency > maxBF then HIGH
+    ---                                         else OK fi  
+    ---                                     fi .
+
+    --- eq temperatureCheck(temperatureSensor(minTemp, maxTemp, currentTemperature)) = if currentTemperature < minTemp then LOW
+    ---                                     else if currentTemperature > maxTemp then HIGH
+    ---                                         else OK fi
+    ---                                     fi .
+
+    --- eq brainCheck(brainSensor(minBA, maxBA, currentBrainActivity)) = if currentBrainActivity < minBA then LOW
+    ---                                     else if currentBrainActivity > maxBA then HIGH
+    ---                                         else OK fi
+    ---                                     fi .
+
+    op check : GenericSensor -> SensorStatus .
+    eq check(heartSensor(minHB, maxHB, currentHeartbeat)) = if currentHeartbeat < minHB then LOW
+                                        else if currentHeartbeat > maxHB then HIGH
+                                            else OK fi 
+                                        fi .
+
+    eq check(bloodSensor(minBP, maxBP, currentBloodPressure)) = if currentBloodPressure < minBP then LOW
+                                        else if currentBloodPressure > maxBP then HIGH
+                                            else OK fi 
+                                        fi .
+
+    eq check(breathSensor(minBF, maxBF, currentBreathFrequency)) = if currentBreathFrequency < minBF then LOW
+                                        else if currentBreathFrequency > maxBF then HIGH
+                                            else OK fi  
+                                        fi .
+
+    eq check(temperatureSensor(minTemp, maxTemp, currentTemperature)) = if currentTemperature < minTemp then LOW
+                                        else if currentTemperature > maxTemp then HIGH
+                                            else OK fi
+                                        fi .
+
+    eq check(brainSensor(minBA, maxBA, currentBrainActivity)) = if currentBrainActivity < minBA then LOW
+                                        else if currentBrainActivity > maxBA then HIGH
+                                            else OK fi
+                                        fi .
+endfm

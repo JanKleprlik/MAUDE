@@ -1,0 +1,128 @@
+load sensors.maude
+
+fmod DEVICE is 
+    including STRING .
+    extending SENSOR .
+
+    sort GenericDevice .
+    sorts HeartDevice BloodDevice BreathDevice TemperatureDevice BrainDevice .
+
+    subsorts GenericDevice < HeartDevice  BloodDevice BreathDevice TemperatureDevice BrainDevice .
+
+    sort ICU .
+
+    sort DeviceStatus PatientStatus DeviceReaction .
+    subsorts String < PatientStatus DeviceStatus DeviceReaction .
+
+    var heartD : HeartDevice .
+    var bloodD : BloodDevice .
+    var breathD : BreathDevice .
+    var temperatureD : TemperatureDevice .
+    var brainD : BrainDevice .
+
+    var heartS : HeartSensor .
+    var bloodS : BloodSensor .
+    var breathS : BreathSensor .
+    var temperatureS : TemperatureSensor .
+    var brainS : BrainSensor .
+
+    var genericDevice : GenericDevice .
+    var genericSensor : GenericSensor .
+    
+    --- constants
+    ops GOOD BADLOW BADHIGH : -> DeviceStatus .
+    eq GOOD = "This devices sensors are within limits" .
+    eq BADLOW = "This device should react asap - LOW" .
+    eq BADHIGH = "This device should react asap - HIGH" .
+
+    ops STABLE UNSTABLE : -> PatientStatus .
+    eq STABLE = "Patient is in a stable condition" .
+    eq UNSTABLE = "Patient is in an unstable condition" .
+
+    ops decHeartRate incHeartRate : -> String .
+    eq decHeartRate = "Decreasing heart rate ..." .
+    eq incHeartRate = "Increasing heart rate ..." .
+
+    ops decBreathRate incBreathRate : -> String .
+    eq decBreathRate = "Decreasing breath rate ..." .
+    eq incBreathRate = "Increasing breath rate ..." .
+
+    ops decTemperature incTemperature : -> String .
+    eq decTemperature = "Decreasing temperature ..." .
+    eq incTemperature = "Increasing temperature ..." .
+
+    ops decBloodPressure incBloodPressure : -> String .
+    eq decBloodPressure = "Decreasing blood pressure ..." .
+    eq incBloodPressure = "Increasing blood pressure ..." .
+
+    ops decBrainActivity incBrainActivity : -> String .
+    eq decBrainActivity = "Decreasing brain activity ..." .
+    eq incBrainActivity = "Increasing brain activity ..." .
+
+    op noActivity : -> String .
+    eq noActivity = "No activity needed." .
+
+    --- initialiser
+    op heartDevice : HeartSensor -> HeartDevice .
+    op bloodDevice : BloodSensor -> BloodDevice .
+    op breathDevice : BreathSensor -> BreathDevice .
+    op temperatureDevice : TemperatureSensor -> TemperatureDevice .
+    op brainDevice : BrainSensor -> BrainDevice .
+
+    op icu : HeartDevice BloodDevice BreathDevice TemperatureDevice BrainDevice -> ICU .
+
+    --- relevant functions
+    op getDeviceStatus : GenericDevice -> DeviceStatus .
+    eq getDeviceStatus(heartDevice(heartS)) = if check(heartS) == LOW then BADLOW 
+                                else if check(heartS) == HIGH then BADHIGH
+                                    else GOOD fi
+                                fi .
+
+    eq getDeviceStatus(bloodDevice(bloodS)) = if check(bloodS) == LOW then BADLOW 
+                                else if check(bloodS) == HIGH then BADHIGH
+                                    else GOOD fi
+                                fi .
+
+    eq getDeviceStatus(breathDevice(breathS)) = if check(breathS) == LOW then BADLOW 
+                                else if check(breathS) == HIGH then BADHIGH
+                                    else GOOD fi
+                                fi .
+
+    eq getDeviceStatus(temperatureDevice(temperatureS)) = if check(temperatureS) == LOW then BADLOW 
+                                else if check(temperatureS) == HIGH then BADHIGH
+                                    else GOOD fi
+                                fi .
+
+    eq getDeviceStatus(brainDevice(brainS)) = if check(brainS) == LOW then BADLOW 
+                                else if check(brainS) == HIGH then BADHIGH
+                                    else GOOD fi
+                                fi .
+                                
+    --- op device : GenericSensor -> GenericDevice .
+    --- eq getDeviceStatus(device(genericSensor)) = if check(genericSensor) == LOW then BADLOW 
+    ---                                 else if check(genericSensor) == HIGH then BADHIGH 
+    ---                                     else GOOD fi 
+    ---                                 fi .
+
+    op getPatientCondition : ICU -> PatientStatus .
+    
+    ceq getPatientCondition(icu(heartD, bloodD, breathD, temperatureD, brainD)) = STABLE if getDeviceStatus(heartD) == GOOD /\ getDeviceStatus(bloodD) == GOOD /\ getDeviceStatus(breathD) == GOOD /\ getDeviceStatus(temperatureD) == GOOD /\ getDeviceStatus(brainD) == GOOD .
+    ceq getPatientCondition(icu(heartD, bloodD, breathD, temperatureD, brainD)) = UNSTABLE if getDeviceStatus(heartD) == BADLOW or getDeviceStatus(bloodD) == BADLOW or getDeviceStatus(breathD) == BADLOW or getDeviceStatus(temperatureD) == BADLOW or getDeviceStatus(brainD) == BADLOW 
+            or getDeviceStatus(heartD) == BADHIGH or getDeviceStatus(bloodD) == BADHIGH or getDeviceStatus(breathD) == BADHIGH or getDeviceStatus(temperatureD) == BADHIGH or getDeviceStatus(brainD) == BADHIGH .
+
+    op reactToSensors : ICU -> DeviceReaction .
+
+    ceq reactToSensors(icu(heartD, bloodD, breathD, temperatureD, brainD)) = incHeartRate if getDeviceStatus(heartD) == BADLOW .
+    ceq reactToSensors(icu(heartD, bloodD, breathD, temperatureD, brainD)) = decHeartRate if getDeviceStatus(heartD) == BADHIGH .
+    ceq reactToSensors(icu(heartD, bloodD, breathD, temperatureD, brainD)) = incBloodPressure if getDeviceStatus(bloodD) == BADLOW .
+    ceq reactToSensors(icu(heartD, bloodD, breathD, temperatureD, brainD)) = decBloodPressure if getDeviceStatus(bloodD) == BADHIGH .
+    ceq reactToSensors(icu(heartD, bloodD, breathD, temperatureD, brainD)) = incBreathRate if getDeviceStatus(breathD) == BADLOW .
+    ceq reactToSensors(icu(heartD, bloodD, breathD, temperatureD, brainD)) = decBreathRate if getDeviceStatus(breathD) == BADHIGH .
+    ceq reactToSensors(icu(heartD, bloodD, breathD, temperatureD, brainD)) = incTemperature if getDeviceStatus(temperatureD) == BADLOW .
+    ceq reactToSensors(icu(heartD, bloodD, breathD, temperatureD, brainD)) = decTemperature if getDeviceStatus(temperatureD) == BADHIGH .
+    ceq reactToSensors(icu(heartD, bloodD, breathD, temperatureD, brainD)) = incBrainActivity if getDeviceStatus(brainD) == BADLOW .
+    ceq reactToSensors(icu(heartD, bloodD, breathD, temperatureD, brainD)) = decBrainActivity if getDeviceStatus(brainD) == BADHIGH .
+
+    eq reactToSensors(icu(heartD, bloodD, breathD, temperatureD, brainD)) = noActivity .
+
+endfm

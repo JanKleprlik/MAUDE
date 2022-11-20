@@ -1,0 +1,61 @@
+load device.maude
+
+fmod TEST is
+    including DEVICE .
+    including SENSOR .
+
+    --- definition of constant devices for testing
+    ops HeartS HeartSFailureLOW HeartSFailureHIGH : -> HeartSensor .
+    ops BloodS BloodSFailureLOW BloodSFailureHIGH : -> BloodSensor .
+    ops BreathS BreathSFailureLOW BreathSFailureHIGH : -> BreathSensor .
+    ops TempS TempSFailureLOW TempSFailureHIGH : -> TemperatureSensor .
+    ops BrainS BrainSFailureLOW BrainSFailureHIGH : -> BrainSensor .
+
+    --- sensor definition
+    eq HeartS = heartSensor(45.0, 130.0, 75.0) .
+    eq BloodS = bloodSensor(4.5, 7.5, 5.0) .
+    eq BreathS = breathSensor(12.0, 20.0, 15.0) .
+    eq TempS = temperatureSensor(36.5, 37.5, 36.8) .
+    eq BrainS = brainSensor(0.5, 1.5, 1.0) .
+    
+    eq HeartSFailureLOW = heartSensor(45.0, 130.0, 40.0) .
+    eq BloodSFailureLOW = bloodSensor(4.5, 7.5, 3.0) .
+    eq BreathSFailureLOW = breathSensor(12.0, 20.0, 10.0) .
+    eq TempSFailureLOW = temperatureSensor(36.5, 37.5, 36.0) .
+    eq BrainSFailureLOW = brainSensor(0.5, 1.5, 0.2) .
+
+    eq HeartSFailureHIGH = heartSensor(45.0, 130.0, 140.0) .
+    eq BloodSFailureHIGH = bloodSensor(4.5, 7.5, 8.0) .
+    eq BreathSFailureHIGH = breathSensor(12.0, 20.0, 25.0) .
+    eq TempSFailureHIGH = temperatureSensor(36.5, 37.5, 38.0) .
+    eq BrainSFailureHIGH = brainSensor(0.5, 1.5, 2.0) .
+
+    --- icu setup definitions for testing
+    ops icuAllGood icuLowHeartRate icuLowPressure icuHighBreathing icuMultipleHigh icuMultipleLow icuHighAndLow : -> ICU .
+    eq icuAllGood = icu(heartDevice(HeartS), bloodDevice(BloodS), breathDevice(BreathS), temperatureDevice(TempS) , brainDevice(BrainS)) .
+    eq icuLowHeartRate = icu(heartDevice(HeartSFailureLOW), bloodDevice(BloodS), breathDevice(BreathS), temperatureDevice(TempS) , brainDevice(BrainS)) .
+    eq icuLowPressure = icu(heartDevice(HeartS), bloodDevice(BloodSFailureLOW), breathDevice(BreathS), temperatureDevice(TempS) , brainDevice(BrainS)) .
+    eq icuHighBreathing = icu(heartDevice(HeartS), bloodDevice(BloodS), breathDevice(BreathSFailureHIGH), temperatureDevice(TempS) , brainDevice(BrainS)) .
+    eq icuMultipleHigh = icu(heartDevice(HeartSFailureHIGH), bloodDevice(BloodSFailureHIGH), breathDevice(BreathSFailureHIGH), temperatureDevice(TempSFailureHIGH) , brainDevice(BrainSFailureHIGH)) .
+    eq icuMultipleLow = icu(heartDevice(HeartSFailureLOW), bloodDevice(BloodSFailureLOW), breathDevice(BreathSFailureLOW), temperatureDevice(TempSFailureLOW) , brainDevice(BrainSFailureLOW)) .
+    eq icuHighAndLow = icu(heartDevice(HeartSFailureHIGH), bloodDevice(BloodSFailureLOW), breathDevice(BreathSFailureHIGH), temperatureDevice(TempSFailureLOW) , brainDevice(BrainSFailureHIGH)) .
+
+    --- test cases
+
+    --- reduce getPatientCondition(icuAllGood) .
+    --- reduce getPatientCondition(icuLowHeartRate) .
+    --- reduce getPatientCondition(icuLowPressure) .
+    --- reduce getPatientCondition(icuHighBreathing) .
+    --- reduce getPatientCondition(icuMultipleHigh) .
+    --- reduce getPatientCondition(icuMultipleLow) .
+    --- reduce getPatientCondition(icuHighAndLow) .
+
+    --- reduce reactToSensors(icuAllGood) .
+    --- reduce reactToSensors(icuLowHeartRate) .
+    --- reduce reactToSensors(icuLowPressure) .
+    --- reduce reactToSensors(icuHighBreathing) .
+    --- reduce reactToSensors(icuMultipleHigh) .
+    --- reduce reactToSensors(icuMultipleLow) .
+    --- reduce reactToSensors(icuHighAndLow) .
+
+endfm
